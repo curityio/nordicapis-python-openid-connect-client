@@ -14,29 +14,23 @@ There is some blank spaces in the code, which you're supposed to fill in.
 
 ### client.py
 1. Fill in the missing data for the token request
-
-When done, you should be able to get a token from the server
+    When done, you should be able to get a token from the server
 
 2. Fill in the data for the refresh request
-
-When done, you should be able to refresh the access token
+    When done, you should be able to refresh the access token
 
 3. Fill in the data for the revoke request
-
-When done, you should be able to revoke the access token
+    When done, you should be able to revoke the access token
 
 ### app.py
 4. Add the token to the api request
-
-You should now be able to request data from 
+    You should now be able to request data from 
 
 5. Add openid to the requested scopes, in configuration.
-
-You should get an id_token from the token response
+    You should get an id_token from the token response
 
 6. Validate the id_token
-
-Use the validator to validate the id_token
+    Use the validator to validate the id_token
 
 
 ## Running the app
