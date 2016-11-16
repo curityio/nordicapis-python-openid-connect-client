@@ -1,14 +1,5 @@
-# OpenID Connect Demo
-This is a demo application to explain how the OpenID Connect code flow is implemented.
-
-## Usage
-
-```bash
-$ python app.py
-```
-
-Flask will start a web server listening on all interfaecs that can be used for demo purposes. The webserver will use HTTPS with a certificate for localhost.
-Browse to https://localhost:5443 to see the app.
+# OAuth/OpenID Connect Workshop
+This is a OpenID Connect example, used as an assigment in the OAuth2 and OpenID Connect workshop given by Curity AB.
 
 ## Dependencies
 
@@ -17,6 +8,39 @@ Browse to https://localhost:5443 to see the app.
 **OpenSSL 1.0** to be able to do modern TLS versions. Python together with 0.9.x has a bug that makes it impossible to select protocol in the handshake, so it cannot connect to servers that have disabled SSLv2.
 
 Python dependencies can be installed by using PIP: `pip install -r requirements.txt`
+
+## Assignment
+There is some blank spaces in the code, which you're supposed to fill in. 
+
+### client.py
+1. Fill in the missing data for the token request
+When done, you should be able to get a token from the server
+
+2. Fill in the data for the refresh request
+When done, you should be able to refresh the access token
+
+3. Fill in the data for the revoke request
+When done, you should be able to revoke the access token
+
+### app.py
+4. Add the token to the api request
+You should now be able to request data from 
+
+5. Add openid to the requested scopes, in configuration.
+You should get an id_token from the token response
+
+6. Validate the id_token
+Use the validator to validate the id_token
+
+
+## Running the app
+
+```bash
+$ python app.py
+```
+
+Flask will start a web server listening on all interfaces. The webserver will by default use HTTPS with a selfsigned certificate for localhost.
+Browse to https://localhost:5443 to see the app.
 
 ## settings.json
 Settings.json is used as a configuration file for the example app. Change the values to match your system.
