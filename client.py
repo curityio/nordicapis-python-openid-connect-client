@@ -107,11 +107,7 @@ class Client:
                 'grant_type': 'authorization_code'}
 
         # Exchange code for tokens
-        try:
-            token_response = urllib2.urlopen(self.config['token_endpoint'], urllib.urlencode(data), context=self.ctx)
-        except urllib2.URLError as te:
-            print "Could not exchange code for tokens"
-            raise te
+        token_response = urllib2.urlopen(self.config['token_endpoint'], urllib.urlencode(data), context=self.ctx)
         return json.loads(token_response.read())
 
     def __authn_req_args(self, state):
