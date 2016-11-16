@@ -65,8 +65,7 @@ def start_code_flow():
     """
     :return: redirects to the authorization server with the appropriate parameters set.
     """
-    # Redirect the Resource Owner to the Authorization Server, with client_id and response_type
-    login_url = ""
+    login_url = _client.get_authn_req_url(session)
     return redirect(login_url)
 
 
@@ -138,6 +137,7 @@ def call_api():
                 try:
                     api_request = urllib2.Request(_config['api_endpoint'])
 
+                    # Assignment 4
                     # Add the access token to the request
 
                     response = urllib2.urlopen(api_request)
@@ -173,12 +173,20 @@ def oauth_callback():
     session.pop('state', None)
 
     # Store in basic server session, since flask session use cookie for storage
-    userSession = UserSession()
+    user = UserSession()
 
     print token_data
 
-    # Add tokens to the session object
-    # ID token is a JWT, and should be validated
+    if 'id_token' in token_data:
+        # Assignment 6
+        # validate JWS; signature, aud and iss.
+        user.id_token = token_data['id_token']
+
+    if 'access_token' in token_data:
+        user.access_token = token_data['access_token']
+
+    if 'refresh_token' in token_data:
+        user.refresh_token = token_data['refresh_token']
 
     session['session_id'] = generate_random_string()
     _session_store[session['session_id']] = userSession

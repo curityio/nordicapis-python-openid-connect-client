@@ -66,7 +66,8 @@ class Client:
 
         revoke_request = urllib2.Request(self.config['revocation_endpoint'])
         data = {
-            # Add the data to the request
+                # Assignment 3
+                # Add the data to the refresh request
         }
         urllib2.urlopen(revoke_request, urllib.urlencode(data), context=self.ctx)
 
@@ -77,7 +78,8 @@ class Client:
         :return: the new access token
         """
         data = {
-            # Add the data to the request
+                # Assignment 2
+                # Add the data to the refresh request
         }
         token_response = urllib2.urlopen(self.config['token_endpoint'], urllib.urlencode(data), context=self.ctx)
         return json.loads(token_response.read())
@@ -99,9 +101,9 @@ class Client:
         :param code: The authorization code to use when getting tokens
         :return the json response containing the tokens
         """
-        data = {'client_id': self.config['client_id'], "client_secret": self.config['client_secret'],
-                'code': code,
-                'redirect_uri': self.config['redirect_uri'],
+        # Assignment 1
+        # Fill in the the missing data for the token request
+        data = {'client_id': self.config['client_id'], 
                 'grant_type': 'authorization_code'}
 
         # Exchange code for tokens
