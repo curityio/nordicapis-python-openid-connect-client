@@ -178,7 +178,7 @@ def oauth_callback():
     print token_data
 
     if 'id_token' in token_data:
-        # Assignment 6
+        # Assignment 5
         # validate JWS; signature, aud and iss.
         user.id_token = token_data['id_token']
 
