@@ -67,7 +67,7 @@ class Client:
         revoke_request = urllib2.Request(self.config['revocation_endpoint'])
         data = {
                 # Assignment 3
-                # Add the data to the refresh request
+                # Add the data to the revocation request
         }
         urllib2.urlopen(revoke_request, urllib.urlencode(data), context=self.ctx)
 

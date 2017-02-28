@@ -48,6 +48,6 @@ def decode_token(token):
 
 def generate_random_string():
     """
-    :return: a 20 character random stringmusing only ascii characters and digits
+    :return: a 20 character random string using only ascii characters and digits
     """
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20))
