@@ -175,7 +175,8 @@ def oauth_callback():
     # Store in basic server session, since flask session use cookie for storage
     user = UserSession()
 
-    print token_data
+    if 'access_token' in token_data:
+        user.access_token = token_data['access_token']
 
     if 'id_token' in token_data:
         # Assignment 5
