@@ -9,7 +9,8 @@
 		"2c8d0a13-150f-c1e0-7133-68f1ca556699",
 		"3e67db04-ea53-b634-6258-0e31c088b201",
 		"ae0af1b8-43a3-621c-d642-3959b0a794d2",
-		"3a90da5e-97bd-92d2-f123-50d233e85102"
+		"3a90da5e-97bd-92d2-f123-50d233e85102",
+		"3146854c-619a-7465-430b-733a3772f46e"
 	],
 	"folders": [],
 	"timestamp": 0,
@@ -52,6 +53,26 @@
 			"description": "\n\n\n\n",
 			"collectionId": "6671e42e-eeb2-b654-a919-61ed20fe9a4f",
 			"responses": []
+		},
+		{
+			"id": "3146854c-619a-7465-430b-733a3772f46e",
+			"headers": "Accept: application/json\n",
+			"url": "https://nordicapis.curity.io/oauth/v2/metadata/jwks",
+			"pathVariables": {},
+			"preRequestScript": null,
+			"method": "GET",
+			"collectionId": "6671e42e-eeb2-b654-a919-61ed20fe9a4f",
+			"data": null,
+			"dataMode": "params",
+			"name": "JWKS (Json Web Key Set)",
+			"description": "",
+			"descriptionFormat": "html",
+			"time": 1488381768761,
+			"version": 2,
+			"responses": [],
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {}
 		},
 		{
 			"id": "3a90da5e-97bd-92d2-f123-50d233e85102",
@@ -161,7 +182,7 @@
 		{
 			"id": "78131882-e417-d187-ef67-7969d857b5ea",
 			"headers": "Content-Type: application/x-www-form-urlencoded\n",
-			"url": "https://nordicapis.curity.io/oauth/v2/revoke",
+			"url": "https://nordicapis.curity.io/oauth/v2/introspection",
 			"preRequestScript": null,
 			"pathVariables": {},
 			"method": "POST",
@@ -189,7 +210,7 @@
 			"tests": null,
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1488378466779,
+			"time": 1488381784329,
 			"name": "Introspect",
 			"description": "",
 			"collectionId": "6671e42e-eeb2-b654-a919-61ed20fe9a4f",
