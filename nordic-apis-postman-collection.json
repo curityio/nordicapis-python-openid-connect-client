@@ -1,0 +1,297 @@
+{
+	"id": "6671e42e-eeb2-b654-a919-61ed20fe9a4f",
+	"name": "NordicAPIs",
+	"description": "",
+	"order": [
+		"780682f5-ec02-68c8-35c9-09848239a750",
+		"78131882-e417-d187-ef67-7969d857b5ea",
+		"d0c2831e-720f-2fd5-b6a3-3099d7e8b2f0",
+		"2c8d0a13-150f-c1e0-7133-68f1ca556699",
+		"3e67db04-ea53-b634-6258-0e31c088b201",
+		"ae0af1b8-43a3-621c-d642-3959b0a794d2",
+		"3a90da5e-97bd-92d2-f123-50d233e85102"
+	],
+	"folders": [],
+	"timestamp": 0,
+	"owner": "1441788",
+	"public": false,
+	"requests": [
+		{
+			"id": "2c8d0a13-150f-c1e0-7133-68f1ca556699",
+			"headers": "",
+			"url": "https://nordicapis.curity.io/oauth/v2/revoke",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "POST",
+			"data": [
+				{
+					"key": "token",
+					"value": "THE_TOKEN",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_id",
+					"value": "client-1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_secret",
+					"value": "Password1",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "urlencoded",
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1488378495320,
+			"name": "Revoke Token",
+			"description": "\n\n\n\n",
+			"collectionId": "6671e42e-eeb2-b654-a919-61ed20fe9a4f",
+			"responses": []
+		},
+		{
+			"id": "3a90da5e-97bd-92d2-f123-50d233e85102",
+			"headers": "Authorization: Bearer THE_TOKEN\n",
+			"url": "https://nordicapis.curity.io/oauth/v2/userinfo",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1488378538345,
+			"name": "UserInfo",
+			"description": "",
+			"collectionId": "6671e42e-eeb2-b654-a919-61ed20fe9a4f",
+			"responses": []
+		},
+		{
+			"id": "3e67db04-ea53-b634-6258-0e31c088b201",
+			"headers": "",
+			"url": "https://nordicapis.curity.io/oauth/v2/token",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "POST",
+			"data": [
+				{
+					"key": "grant_type",
+					"value": "client_credentials",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_id",
+					"value": "client-1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_secret",
+					"value": "Password1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "scope",
+					"value": "read",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "urlencoded",
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1488378501578,
+			"name": "Client Credentials",
+			"description": "\n\n\n\n",
+			"collectionId": "6671e42e-eeb2-b654-a919-61ed20fe9a4f",
+			"responses": []
+		},
+		{
+			"id": "780682f5-ec02-68c8-35c9-09848239a750",
+			"headers": "",
+			"url": "https://nordicapis.curity.io/oauth/v2/token",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "POST",
+			"data": [
+				{
+					"key": "grant_type",
+					"value": "authorization_code",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_id",
+					"value": "client-1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_secret",
+					"value": "Password1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "code",
+					"value": "THE_CODE",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "urlencoded",
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1488378475779,
+			"name": "Get Token from IDSVR CODE-flow",
+			"description": "\n",
+			"collectionId": "6671e42e-eeb2-b654-a919-61ed20fe9a4f",
+			"responses": []
+		},
+		{
+			"id": "78131882-e417-d187-ef67-7969d857b5ea",
+			"headers": "Content-Type: application/x-www-form-urlencoded\n",
+			"url": "https://nordicapis.curity.io/oauth/v2/revoke",
+			"preRequestScript": null,
+			"pathVariables": {},
+			"method": "POST",
+			"data": [
+				{
+					"key": "token",
+					"value": "THE_TOKEN",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_id",
+					"value": "client-1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_secret",
+					"value": "Password1",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "urlencoded",
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1488378466779,
+			"name": "Introspect",
+			"description": "",
+			"collectionId": "6671e42e-eeb2-b654-a919-61ed20fe9a4f",
+			"responses": []
+		},
+		{
+			"id": "ae0af1b8-43a3-621c-d642-3959b0a794d2",
+			"headers": "",
+			"url": "https://nordicapis.curity.io/oauth/v2/token",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "POST",
+			"data": [
+				{
+					"key": "grant_type",
+					"value": "password",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_id",
+					"value": "client-1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_secret",
+					"value": "Password1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "scope",
+					"value": "read",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "username",
+					"value": "THE_USER",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "password",
+					"value": "THE_PASSWORD",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "urlencoded",
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1488378519722,
+			"name": "ROPC",
+			"description": "\n\n\n\n",
+			"collectionId": "6671e42e-eeb2-b654-a919-61ed20fe9a4f",
+			"responses": []
+		},
+		{
+			"id": "d0c2831e-720f-2fd5-b6a3-3099d7e8b2f0",
+			"headers": "",
+			"url": "https://nordicapis.curity.io/oauth/v2/token",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "POST",
+			"data": [
+				{
+					"key": "grant_type",
+					"value": "refresh_token",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_id",
+					"value": "client-1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "client_secret",
+					"value": "Password1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "refresh_token",
+					"value": "THE_REFRESH_TOKEN",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "urlencoded",
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1488378485445,
+			"name": "Refresh Token",
+			"description": "\n\n\n\n",
+			"collectionId": "6671e42e-eeb2-b654-a919-61ed20fe9a4f",
+			"responses": []
+		}
+	]
+}
