@@ -118,8 +118,7 @@ class Client:
         args = {'scope': self.config['scope'],
                 'response_type': 'code',
                 'client_id': self.config['client_id'],
-                'state': state,
-                'redirect_uri': self.config['redirect_uri']}
+                'state': state}
 
         if 'authn_parameters' in self.config:
             args.update(self.config['authn_parameters'])
