@@ -6,6 +6,7 @@
   "authorization_endpoint": "https://nordicapis.curity.io/oauth/v2/authorize",
   "token_endpoint": "https://nordicapis.curity.io/oauth/v2/token",
   "logout_endpoint": "https://nordicapis.curity.io/authn/authenticate/logout",
+  "api_endpoint": "https://nordicapis-api.curity.io/hello_world",
   "jwks_uri": "https://nordicapis.curity.io/oauth/v2/metadata/jwks",
   "revocation_endpoint": "https://nordicapis.curity.io/oauth/v2/revoke",
   "base_url": "https://localhost:5443"
