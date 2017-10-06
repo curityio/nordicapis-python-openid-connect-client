@@ -15,7 +15,6 @@
 ##########################################################################
 
 import json
-import ssl
 import urllib
 import urllib2
 
@@ -24,20 +23,20 @@ import tools
 
 class Client:
     def __init__(self, config):
-        self.ctx = ssl.create_default_context()
         self.config = config
+
+        print 'Getting ssl context for oauth server'
+        self.ctx = tools.get_ssl_context(self.config)
         self.__init_config()
 
-    def __init_config(self):
-        if 'verify_ssl_server' in self.config and not self.config['verify_ssl_server']:
-            self.ctx.check_hostname = False
-            self.ctx.verify_mode = ssl.CERT_NONE
 
+    def __init_config(self):
         if 'discovery_url' in self.config:
             discovery = urllib2.urlopen(self.config['discovery_url'], context=self.ctx)
             self.config.update(json.loads(discovery.read()))
         else:
             print "No discovery url configured, all endpoints needs to be configured manually"
+
 
         # Mandatory settings
         if 'authorization_endpoint' not in self.config:
@@ -66,8 +65,8 @@ class Client:
 
         revoke_request = urllib2.Request(self.config['revocation_endpoint'])
         data = {
-                # Assignment 3
-                # Add the data to the revocation request
+            # Assignment 3
+            # Add the data to the revocation request
         }
         urllib2.urlopen(revoke_request, urllib.urlencode(data), context=self.ctx)
 
@@ -78,13 +77,13 @@ class Client:
         :return: the new access token
         """
         data = {
-                # Assignment 2
-                # Add the data to the refresh request
+            # Assignment 2
+            # Add the data to the refresh request
         }
         token_response = urllib2.urlopen(self.config['token_endpoint'], urllib.urlencode(data), context=self.ctx)
         return json.loads(token_response.read())
 
-    def get_authn_req_url(self, session):
+    def get_authn_req_url(self, session, acr, forceAuthN):
         """
         :param session: the session, will be used to keep the OAuth state
         :return redirect url for the OAuth code flow
@@ -92,6 +91,8 @@ class Client:
         state = tools.generate_random_string()
         session['state'] = state
         request_args = self.__authn_req_args(state)
+        if acr: request_args["acr_values"] = acr
+        if forceAuthN: request_args["prompt"] = "login"
         login_url = "%s?%s" % (self.config['authorization_endpoint'], urllib.urlencode(request_args))
         print "Redirect to federation service %s" % login_url
         return login_url
@@ -101,13 +102,20 @@ class Client:
         :param code: The authorization code to use when getting tokens
         :return the json response containing the tokens
         """
+
         # Assignment 1
         # Fill in the the missing data for the token request
-        data = {'client_id': self.config['client_id'], 
+
+        data = {'client_id': self.config['client_id'],
+                'redirect_uri': self.config['redirect_uri'],
                 'grant_type': 'authorization_code'}
 
         # Exchange code for tokens
-        token_response = urllib2.urlopen(self.config['token_endpoint'], urllib.urlencode(data), context=self.ctx)
+        try:
+            token_response = urllib2.urlopen(self.config['token_endpoint'], urllib.urlencode(data), context=self.ctx)
+        except urllib2.URLError as te:
+            print "Could not exchange code for tokens"
+            raise te
         return json.loads(token_response.read())
 
     def __authn_req_args(self, state):
@@ -118,7 +126,8 @@ class Client:
         args = {'scope': self.config['scope'],
                 'response_type': 'code',
                 'client_id': self.config['client_id'],
-                'state': state}
+                'state': state,
+                'redirect_uri': self.config['redirect_uri']}
 
         if 'authn_parameters' in self.config:
             args.update(self.config['authn_parameters'])

@@ -94,15 +94,19 @@
     </script>
 </head>
 <body>
-<div class="navbar">
-    <div class="row">
-        <div class="col-md-3"></div>
-        <div class="col-md-6">
-            <a href="/"><img src="{{ url_for('static', filename='logo.png') }}"/></a>
-        </div>
-        <div class="col-md-3"></div>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">
+          <img alt="Brand" style="width:100px;" src="{{ url_for('static', filename='oauth-logo.png') }}">
+        </a>
+      </div>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/logout">Logout</a></li>
+      </ul>
     </div>
-</div>
+  </nav>
+
 <div class="container-fluid">
     {% if error %}
         <div class="row">
@@ -115,42 +119,32 @@
     {% endif %}
     <div class="row">
         <div class="col-md-3"></div>
-        <div class="col-md-6">
+        <div class="col-md-5">
             <h2 class="welcome">Welcome <span id="sessionname"></span>!</h2>
         </div>
     </div>
     <div class="row">
         <div class="col-md-3"></div>
         <div class="col-md-6">
-            {% if not session %}
-                <p class="text-default">This is a demo application to demonstrate the use for OAuth2 and OpenID Connect. </p>
-
-                <p class="text-default">Pressing Sign In will redirect you to {{ server_name }} and authorize
-                    the application python-flask to access your profile info. The data will only be used to
-                    demonstrate
-                    the possibilities of the OpenID Connect
-                    protocol and will not be stored. Be sure to revoke access when you are satisfied.</p>
-                <a class="btn btn-link" role="button" href="/login">Sign In</a>
-            {% else %}
 
                 <ul class="list-group">
                     {% if session.api_response %}
                         <li class="list-group-item">
                             API Response
                             <span class="label pull-right" id="api-response-status-code">
-                               {{ session.api_response.code }}
+                               {{ session.api_response.code | e }}
                             </span>
                         </li>
                         <div>
-                            <pre class="json hidden" id="api-response-data">{{ session.api_response['data'] }}</pre>
+                            <pre class="json hidden" id="api-response-data">{{ session.api_response['data'] | e }}</pre>
                         </div>
                     {% endif %}
 
                     {% if session.id_token %}
                         <li class="list-group-item">ID Token</li>
                         <div>
-                            <pre class="json hidden">{{ session.id_token_json[0] }}</pre>
-                            <pre class="json hidden" id="id-token-payload">{{ session.id_token_json[1] }}</pre>
+                            <pre class="json hidden">{{ session.id_token_json[0] | e }}</pre>
+                            <pre class="json hidden" id="id-token-payload">{{ session.id_token_json[1] | e }}</pre>
                         </div>
                     {% endif %}
 
@@ -162,10 +156,10 @@
                         </li>
                         <div>
                             {% if session.access_token_json %}
-                                <pre class="json hidden">{{ session.access_token_json[0] }}</pre>
-                                <pre class="json hidden">{{ session.access_token_json[1] }}</pre>
+                                <pre class="json hidden">{{ session.access_token_json[0] | e }}</pre>
+                                <pre class="json hidden">{{ session.access_token_json[1] | e }}</pre>
                             {% else %}
-                                <pre>{{ session.access_token }}</pre>
+                                <pre>{{ session.access_token | e }}</pre>
                             {% endif %}
                         </div>
                     {% endif %}
@@ -175,11 +169,10 @@
                             <li class="list-group-item">Refresh Token
                                 <a href="/revoke" class="btn btn-xs btn-danger pull-right">revoke</a>
                             </li>
-                            <pre>{{ session.refresh_token }}</pre>
+                            <pre>{{ session.refresh_token | e }}</pre>
                         </div>
                     {% endif %}
                 </ul>
-            {% endif %}
         </div>
         <div class="col-md-3"></div>
     </div>
@@ -187,12 +180,22 @@
         <div class="col-md-3"></div>
         <div class="col-md-6">
             {% if session %}
+              {% if not error %}
                 <div class="btn-group btn-group-justified mb" role="group">
                     <a href="/call-api" class="btn btn-default" type="button">Request data from api</a>
                 </div>
-                <div class="btn-group btn-group-justified" role="group">
-                    <a class="btn btn-default" type="button" href="/logout">Log out</a>
-                </div>
+              {%  endif %}
+                <form action="/start-login" method="get">
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="acr" id="acr" placeholder="Authentication class context reference (ACR)">
+                    </div>
+                    <div class="checkbox">
+                        <label><input type="checkbox" name="forceAuthN">Force authentication</label>
+                    </div>
+                    <div style="margin-bottom: 1em">
+                        <button type="submit" class="btn btn-default btn-group-justified mb">Restart Login</button>
+                    </div>
+                </form>                
             {% endif %}
         </div>
         <div class="col-md-3"></div>

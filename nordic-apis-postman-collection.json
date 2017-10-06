@@ -57,7 +57,7 @@
 		{
 			"id": "3146854c-619a-7465-430b-733a3772f46e",
 			"headers": "Accept: application/json\n",
-			"url": "https://nordicapis.curity.io/oauth/v2/metadata/jwks",
+			"url": "https://nordicapis.curity.io/~/jwks",
 			"pathVariables": {},
 			"preRequestScript": null,
 			"method": "GET",

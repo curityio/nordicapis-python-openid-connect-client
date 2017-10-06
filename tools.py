@@ -17,13 +17,13 @@
 import base64
 import random
 import string
+import ssl
 
 
-def base64_urldecode(string):
-    string.replace('-', '+')
-    string.replace('_', '/')
-    string += '=' * (4 - (len(string) % 4))
-    return base64.b64decode(string)
+def base64_urldecode(s):
+    ascii_string = str(s)
+    ascii_string += '=' * (4 - (len(ascii_string) % 4))
+    return base64.urlsafe_b64decode(ascii_string)
 
 
 def decode_token(token):
@@ -33,14 +33,10 @@ def decode_token(token):
     :param token:
     :return: A decoded jwt, or None if its not a JWT
     """
-    if token and len(token.split('.')) == 3:
-        header = token.split('.')[0]
-        header += '=' * (4 - len(header) % 4)
+    parts = token.split('.')
 
-        payload = token.split('.')[1]
-        payload += '=' * (4 - len(payload) % 4)
-
-        return base64.b64decode(header), base64.b64decode(payload)
+    if token and len(parts) == 3:
+        return base64_urldecode(parts[0]), base64_urldecode(parts[1])
 
     # It's not a JWT
     return None
@@ -48,6 +44,20 @@ def decode_token(token):
 
 def generate_random_string():
     """
-    :return: a 20 character random string using only ascii characters and digits
+    :return: a 20 character random stringmusing only ascii characters and digits
     """
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(20))
+
+
+def get_ssl_context(config):
+    """
+    :return a ssl context with verify and hostnames settings
+    """
+    ctx = ssl.create_default_context()
+
+    if 'verify_ssl_server' in config and config['verify_ssl_server'].lower() == 'false':
+        print 'Not verifying ssl certificates'
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+    return ctx
+

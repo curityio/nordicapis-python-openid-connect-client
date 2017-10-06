@@ -24,6 +24,7 @@ from urlparse import urlparse
 from client import Client
 from tools import decode_token, generate_random_string
 from validator import JwtValidator
+from config import Config
 
 _app = Flask(__name__)
 
@@ -47,25 +48,30 @@ def index():
     :return: the index page with the tokens, if set.
     """
     user = None
+    is_logged_in = False
     if 'session_id' in session:
         user = _session_store.get(session['session_id'])
     if user:
+        is_logged_in = True
         if user.id_token:
             user.id_token_json = decode_token(user.id_token)
         if user.access_token:
             user.access_token_json = decode_token(user.access_token)
 
-    return render_template('index.html',
-                           server_name=urlparse(_config['authorization_endpoint']).netloc,
-                           session=user)
+    if is_logged_in:
+        return render_template('index.html',
+                            server_name=urlparse(_config['authorization_endpoint']).netloc,
+                            session=user)
+    else:
+        return render_template('welcome.html')
 
 
-@_app.route('/login')
+@_app.route('/start-login')
 def start_code_flow():
     """
     :return: redirects to the authorization server with the appropriate parameters set.
     """
-    login_url = _client.get_authn_req_url(session)
+    login_url = _client.get_authn_req_url(session, request.args.get("acr", None), request.args.get("forceAuthN", False))
     return redirect(login_url)
 
 
@@ -94,7 +100,8 @@ def refresh():
     try:
         token_data = _client.refresh(user.refresh_token)
     except Exception as e:
-        return create_error('Could not refresh Access Token', e)
+        create_error('Could not refresh Access Token', e)
+        return
     user.access_token = token_data['access_token']
     user.refresh_token = token_data['refresh_token']
     return redirect_with_baseurl('/')
@@ -135,15 +142,18 @@ def call_api():
             user.api_response = None
             if user.access_token:
                 try:
-                    api_request = urllib2.Request(_config['api_endpoint'])
+                    request = urllib2.Request(_config['api_endpoint'])
 
                     # Assignment 4
                     # Add the access token to the request
 
-                    response = urllib2.urlopen(api_request)
+                    request.add_header("Accept", 'application/json')
+                    response = urllib2.urlopen(request)
                     user.api_response = {'code': response.code, 'data': response.read()}
                 except urllib2.HTTPError as e:
                     user.api_response = {'code': e.code, 'data': e.read()}
+                except Exception as e:
+                    user.api_response = {"code": "unknown error", "data": e.message }
             else:
                 user.api_response = None
                 print 'No access token in session'
@@ -178,13 +188,23 @@ def oauth_callback():
     if 'access_token' in token_data:
         user.access_token = token_data['access_token']
 
-    if 'id_token' in token_data:
-        # Assignment 5
+    if _jwt_validator and 'id_token' in token_data:
         # validate JWS; signature, aud and iss.
-        user.id_token = token_data['id_token']
+        # Token type, access token, ref-token and JWT
+        if 'issuer' not in _config:
+            return create_error('Could not validate token: no issuer configured')
 
-    if 'access_token' in token_data:
-        user.access_token = token_data['access_token']
+        try:
+
+            # Assignment 5
+            # validate JWS; signature, aud and iss.
+
+        except BadSignature as bs:
+            return create_error('Could not validate token: %s' % bs.message)
+        except Exception as ve:
+            return create_error("Unexpected exception: %s" % ve.message)
+
+        user.id_token = token_data['id_token']
 
     if 'refresh_token' in token_data:
         user.refresh_token = token_data['refresh_token']
@@ -201,6 +221,7 @@ def create_error(message, exception = None):
     :param message:
     :return: redirects to index.html with the error message
     """
+    print 'Caught error!'
     print message, exception
     if _app:
         user = None
@@ -221,10 +242,9 @@ def load_config():
         filename = sys.argv[1]
     else:
         filename = 'settings.json'
-    print 'Loading settings from %s' % filename
-    config = json.loads(open(filename).read())
+    config = Config(filename)
 
-    return config
+    return config.load_config()
 
 
 def redirect_with_baseurl(path):
@@ -242,6 +262,7 @@ if __name__ == '__main__':
         _jwt_validator = JwtValidator(_config)
     else:
         print 'Found no url to JWK set, will not be able to validate JWT signature.'
+        _jwt_validator = None
 
     # create a session store
     _session_store = {}
