@@ -198,6 +198,7 @@ def oauth_callback():
 
             # Assignment 5
             # validate JWS; signature, aud and iss.
+            return create_error("Signature validation is not implemented")
 
         except BadSignature as bs:
             return create_error('Could not validate token: %s' % bs.message)
