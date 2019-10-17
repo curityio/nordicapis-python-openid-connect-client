@@ -1,5 +1,5 @@
 ##########################################################################
-# Copyright 2016 Curity AB
+# Copyright 2019 Curity AB
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,15 +16,11 @@
 
 import json
 import sys
-import urllib2
+import string
+import base64
+import random
 from flask import redirect, request, render_template, session, Flask
-from jwkest import BadSignature
-from urlparse import urlparse
-
 from client import Client
-from tools import decode_token, generate_random_string
-from validator import JwtValidator
-from config import Config
 
 _app = Flask(__name__)
 
@@ -36,10 +32,8 @@ class UserSession:
     access_token = None
     refresh_token = None
     id_token = None
-    access_token_json = None
     id_token_json = None
     name = None
-    api_response = None
 
 
 @_app.route('/')
@@ -48,20 +42,13 @@ def index():
     :return: the index page with the tokens, if set.
     """
     user = None
-    is_logged_in = False
     if 'session_id' in session:
         user = _session_store.get(session['session_id'])
-    if user:
-        is_logged_in = True
-        if user.id_token:
-            user.id_token_json = decode_token(user.id_token)
-        if user.access_token:
-            user.access_token_json = decode_token(user.access_token)
 
-    if is_logged_in:
+    if user:
         return render_template('index.html',
-                            server_name=urlparse(_config['authorization_endpoint']).netloc,
-                            session=user)
+                               server_name=_config['issuer'],
+                               session=user)
     else:
         return render_template('welcome.html')
 
@@ -71,7 +58,9 @@ def start_code_flow():
     """
     :return: redirects to the authorization server with the appropriate parameters set.
     """
-    login_url = _client.get_authn_req_url(session, request.args.get("acr", None), request.args.get("forceAuthN", False))
+    state = generate_random_string()
+    session['state'] = state
+    login_url = _client.get_authorization_request_url(state)
     return redirect(login_url)
 
 
@@ -85,7 +74,7 @@ def logout():
         del _session_store[session['session_id']]
     session.clear()
     if 'logout_endpoint' in _config:
-        print "Logging out against", _config['logout_endpoint']
+        print("Logging out against", _config['logout_endpoint'])
         return redirect(_config['logout_endpoint'] + '?redirect_uri=' + _base_url)
     return redirect_with_baseurl('/')
 
@@ -121,45 +110,9 @@ def revoke():
         if user.refresh_token:
             try:
                 _client.revoke(user.refresh_token)
-            except urllib2.URLError as e:
+            except Exception as e:
                 return create_error('Could not revoke refresh token', e)
             user.refresh_token = None
-
-    return redirect_with_baseurl('/')
-
-
-@_app.route('/call-api')
-def call_api():
-    """
-    Call an api using the Access Token
-    :return: the index template with the data from the api in the parameter 'data'
-    """
-    if 'session_id' in session:
-        user = _session_store.get(session['session_id'])
-        if not user:
-            return redirect_with_baseurl('/')
-        if 'api_endpoint' in _config:
-            user.api_response = None
-            if user.access_token:
-                try:
-                    request = urllib2.Request(_config['api_endpoint'])
-
-                    # Assignment 4
-                    # Add the access token to the request
-
-                    request.add_header("Accept", 'application/json')
-                    response = urllib2.urlopen(request)
-                    user.api_response = {'code': response.code, 'data': response.read()}
-                except urllib2.HTTPError as e:
-                    user.api_response = {'code': e.code, 'data': e.read()}
-                except Exception as e:
-                    user.api_response = {"code": "unknown error", "data": e.message }
-            else:
-                user.api_response = None
-                print 'No access token in session'
-        else:
-            user.api_response = None
-            print 'No API endpoint configured'
 
     return redirect_with_baseurl('/')
 
@@ -182,29 +135,13 @@ def oauth_callback():
         return create_error('Could not fetch token(s)', e)
     session.pop('state', None)
 
-    # Store in basic server session, since flask session use cookie for storage
+    # Store tokens in basic server session, since flask session use cookie for storage
     user = UserSession()
 
     if 'access_token' in token_data:
         user.access_token = token_data['access_token']
 
-    if _jwt_validator and 'id_token' in token_data:
-        # validate JWS; signature, aud and iss.
-        # Token type, access token, ref-token and JWT
-        if 'issuer' not in _config:
-            return create_error('Could not validate token: no issuer configured')
-
-        try:
-
-            # Assignment 5
-            # validate JWS; signature, aud and iss.
-            return create_error("Signature validation is not implemented")
-
-        except BadSignature as bs:
-            return create_error('Could not validate token: %s' % bs.message)
-        except Exception as ve:
-            return create_error("Unexpected exception: %s" % ve.message)
-
+    if 'id_token' in token_data:
         user.id_token = token_data['id_token']
 
     if 'refresh_token' in token_data:
@@ -216,74 +153,87 @@ def oauth_callback():
     return redirect_with_baseurl('/')
 
 
-def create_error(message, exception = None):
+def create_error(message, exception=None):
     """
     Print the error and output it to the page
     :param message:
     :return: redirects to index.html with the error message
     """
-    print 'Caught error!'
-    print message, exception
+    print('Caught error!')
+    print(message, exception)
     if _app:
         user = None
         if 'session_id' in session:
             user = _session_store.get(session['session_id'])
         return render_template('index.html',
-                               server_name=urlparse(_config['authorization_endpoint']).netloc,
+                               server_name=_config['issuer'],
                                session=user,
                                error=message)
 
 
 def load_config():
     """
-    Load config from the file given by argument, or settings.json
-    :return:
+    Load config from config file
+    :return: a map of the config
     """
-    if len(sys.argv) > 1:
-        filename = sys.argv[1]
-    else:
-        filename = 'settings.json'
-    config = Config(filename)
+    filename = 'client_config.json'
+    print('Loading settings from %s' % filename)
 
-    return config.load_config()
+    return json.loads(open(filename).read())
 
 
 def redirect_with_baseurl(path):
     return redirect(_base_url + path)
 
 
+def get_config_or_default(config_key, config, default):
+    if config_key in config:
+        return config[config_key]
+    return default
+
+
+def base64_urldecode(s):
+    ascii_string = str(s)
+    ascii_string += '=' * (4 - (len(ascii_string) % 4))
+    return base64.urlsafe_b64decode(ascii_string)
+
+
+def generate_random_string(size=20):
+    return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(size))
+
+
+def decode_token(token):
+    """
+    Decode a jwt into readable format.
+
+    :param token:
+    :return: A decoded jwt, or None if its not a JWT
+    """
+    parts = token.split('.')
+
+    if token and len(parts) == 3:
+        return base64_urldecode(parts[0]), base64_urldecode(parts[1])
+
+    # It's not a JWT
+    return None
+
+
 if __name__ == '__main__':
     # load the config
     _config = load_config()
 
-    _client = Client(_config)
+    # some default values
+    _debug = get_config_or_default('debug', _config, False)
+    _port = get_config_or_default('port', _config, 9080)
+    _base_url = get_config_or_default('base_url', _config, '')
+    _config['verify_ssl_server'] = get_config_or_default('verify_ssl_server', _config, True)
 
-    # load the jwk set.
-    if 'jwks_uri' in _config:
-        _jwt_validator = JwtValidator(_config)
-    else:
-        print 'Found no url to JWK set, will not be able to validate JWT signature.'
-        _jwt_validator = None
+    # Create the client
+    _client = Client(_config)
 
     # create a session store
     _session_store = {}
 
     # initiate the app
     _app.secret_key = generate_random_string()
-
-    # some default values
-    _debug = 'debug' in _config and _config['debug']
-    if 'port' in _config:
-        _port = _config['port']
-    else:
-        _port = 5443
-    _disable_https = 'disable_https' in _config and _config['disable_https']
-    if 'base_url' in _config:
-        _base_url = _config['base_url']
-    else:
-        _base_url = ''
-
-    if _disable_https:
-        _app.run('0.0.0.0', debug=_debug, port=_port)
-    else:
-        _app.run('0.0.0.0', debug=_debug, port=_port, ssl_context=('keys/localhost.pem', 'keys/localhost.pem'))
+    _app.run('0.0.0.0', debug=_debug, port=_port)
