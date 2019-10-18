@@ -202,22 +202,6 @@ def generate_random_string(size=20):
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(size))
 
 
-def decode_token(token):
-    """
-    Decode a jwt into readable format.
-
-    :param token:
-    :return: A decoded jwt, or None if its not a JWT
-    """
-    parts = token.split('.')
-
-    if token and len(parts) == 3:
-        return base64_urldecode(parts[0]), base64_urldecode(parts[1])
-
-    # It's not a JWT
-    return None
-
-
 if __name__ == '__main__':
     # load the config
     _config = load_config()
