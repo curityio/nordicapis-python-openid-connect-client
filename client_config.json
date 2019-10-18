@@ -1,0 +1,7 @@
+{
+  "client_id": "client-1",
+  "client_secret": "Password1",
+  "redirect_uri": "http://localhost:9080/callback",
+  "scope": "",
+  "issuer": "https://nordicapis.curity.io/~"
+}
