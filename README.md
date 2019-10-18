@@ -8,11 +8,6 @@ This is a OpenID Connect example, used as an assigment in the OAuth2 and OpenID 
 **OpenSSL 1.0** to be able to do modern TLS versions.
 
 
-## Assignment
-
-TODO!
-
-
 ## Running the app
 
 ```bash
@@ -23,17 +18,16 @@ $ python app.py
 Flask will start a web server listening on all interfaces. The webserver will by default use HTTPS with a selfsigned certificate for localhost.
 Browse to https://localhost:5443 to see the app.
 
-## settings.json
-Settings.json is used as a configuration file for the example app. Change the values to match your system.
+## client_config.json
+client_config.json is used as a configuration file for the example app. Change the values to match your system.
 
 Name            | Type    | Mandatory | Default  | Description
 ----------------| ------- | :-------: | -------- | :---------------
 `redirect_uri`  | string  |    ✓      |          | The redirect uri to use, must be registered for the client at the OpenID Connect server.
 `client_id`     | string  |    ✓      |          | The id for the client. Used to authenticate the client.
 `client_secret` | string  |    ✓      |          | The shared secret to use for authentication against the token endpoint.
-`isser`         | URI     |    ✓      |          | The OAuth2 issuer
-`scope`         | string  |           |          | The scopes to ask for.
-`issuer`        | string  |    ✓      |          | The ID of the token issuer.
+`issuer`        | URI     |    ✓      |          | The OAuth2/OpenID Connect issuer.
+`scope`         | string  |           |          | The scopes to ask for. Space separated string.
 `verify_ssl_server` | boolean |       | `true`   | Set to false to disable certificate checks.
 `debug`         | boolean |           | `false`  | If set to true, Flask will be in debug mode and write stacktraces if an error occurs
 `port`          | number  |           | `9080`   | The port that the Flask server should listen to
