@@ -1,8 +1,7 @@
 {
-  "client_id": "python-client",
+  "client_id": "client-1",
   "client_secret": "Password1",
   "redirect_uri": "http://localhost:9080/callback",
-  "scope": "openid",
-  "issuer": "https://dlindau.ngrok.io/~",
-  "debug": true
+  "scope": "",
+  "issuer": "https://nordicapis.curity.io/~",
 }
