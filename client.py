@@ -45,14 +45,14 @@ class Client:
         :raises: raises error when http call fails
         """
         if 'revocation_endpoint' not in self.server_config:
-            print('No revocation endpoint set')
-            return
+            raise Exception('Server configuration did not contain a revocation endpoint')
 
-        revoke_request = urllib.request.Request(
-            self.server_config['revocation_endpoint'])
-        data = {'client_id': self.client_config['client_id'],
-                'client_secret': self.client_config['client_secret'],
-                'token': token}
+        ## Exercise 3
+        # Add the parameters needed to fullfull the revoke token request.
+        # Revoking the Refresh Token should make the Access Token invalid, as well as the refresh token
+        data = {'client_id': self.client_config['client_id'] }
+
+        revoke_request = urllib.request.Request( self.server_config['revocation_endpoint'])
         urllib.request.urlopen(revoke_request, urllib.parse.urlencode(data).encode(), context=self.ctx)
 
     def refresh(self, refresh_token):
@@ -61,10 +61,10 @@ class Client:
         :param refresh_token:
         :return: the new access token
         """
-        data = {'client_id': self.client_config['client_id'],
-                'client_secret': self.client_config['client_secret'],
-                'refresh_token': refresh_token,
-                'grant_type': 'refresh_token'}
+        ## Exercise 2
+        # Add the parameters needed to fullfull the refresh token request.
+        data = {'client_id': self.client_config['client_id']}
+
         token_response = urllib.request.urlopen(self.server_config['token_endpoint'], urllib.parse.urlencode(data).encode(), context=self.ctx)
         return json.loads(token_response.read())
 
@@ -85,11 +85,12 @@ class Client:
         :return the json response containing the tokens
         """
 
+        ## Exercise 1
+        # Add the parameters needed to exchange the authorization code for the requested token(s)
+        # Only the data map needs to be updated
+        # Hint: The client needs to be authenticated, and the token endpoint needs to be instructed what protocol to adhere to.
         data = {'client_id': self.client_config['client_id'],
-                'redirect_uri': self.client_config['redirect_uri'],
-                'client_secret': self.client_config['client_secret'],
-                'code': code,
-                'grant_type': 'authorization_code'}
+                'redirect_uri': self.client_config['redirect_uri']}
 
         # Exchange code for tokens
         try:
@@ -101,8 +102,12 @@ class Client:
         token_data = json.loads(token_response.read())
 
         if 'id_token' in token_data:
-            audience = self.client_config['client_id']
             issuer = self.client_config['issuer']
+
+            ## Exercise 4
+            # Enforce the correct audience for the id token
+            # The validate function will enforce it as long as parameter is set. 
+            audience = None
 
             self.__validate_jwt(token_data['id_token'], issuer, audience)
 
@@ -122,10 +127,9 @@ class Client:
             raise e
 
         if iss != payload['iss']:
-            raise Exception("Invalid issuer %s, expected %s" %
-                            (payload['iss'], iss))
+            raise Exception("Invalid issuer %s, expected %s" % (payload['iss'], iss))
 
-        if payload['aud']:
+        if aud and payload['aud']:
             if (isinstance(payload['aud'], str) and payload['aud'] != aud) or aud not in payload['aud']:
                 raise Exception("Invalid audience %s, expected %s" % (payload['aud'], aud))
 
