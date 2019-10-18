@@ -160,7 +160,8 @@ def create_error(message, exception=None):
     :return: redirects to index.html with the error message
     """
     print('Caught error!')
-    print(message, exception)
+    error_message = "%s: %s" % (message, exception)
+    print(error_message)
     if _app:
         user = None
         if 'session_id' in session:
@@ -168,7 +169,7 @@ def create_error(message, exception=None):
         return render_template('index.html',
                                server_name=_config['issuer'],
                                session=user,
-                               error=message)
+                               error=error_message)
 
 
 def load_config():

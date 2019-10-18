@@ -52,8 +52,10 @@ class Client:
         # Revoking the Refresh Token should make the Access Token invalid, as well as the refresh token
         data = {'client_id': self.client_config['client_id'] }
 
-        revoke_request = urllib.request.Request( self.server_config['revocation_endpoint'])
-        urllib.request.urlopen(revoke_request, urllib.parse.urlencode(data).encode(), context=self.ctx)
+        try:
+            urllib.request.urlopen(self.server_config['revocation_endpoint'], urllib.parse.urlencode(data).encode(), context=self.ctx)
+        except urllib.error.URLError as te:
+            raise Exception("The revoke request needs to be completed. Server error: %s" % te.reason)
 
     def refresh(self, refresh_token):
         """
@@ -65,7 +67,10 @@ class Client:
         # Add the parameters needed to fullfull the refresh token request.
         data = {'client_id': self.client_config['client_id']}
 
-        token_response = urllib.request.urlopen(self.server_config['token_endpoint'], urllib.parse.urlencode(data).encode(), context=self.ctx)
+        try:
+            token_response = urllib.request.urlopen(self.server_config['token_endpoint'], urllib.parse.urlencode(data).encode(), context=self.ctx)
+        except urllib.error.URLError as te:
+            raise Exception("The refresh request needs to be completed. Server error: %s" % te.reason)
         return json.loads(token_response.read())
 
     def get_authorization_request_url(self, state):
@@ -96,8 +101,7 @@ class Client:
         try:
             token_response = urllib.request.urlopen(self.server_config['token_endpoint'], urllib.parse.urlencode(data).encode(), context=self.ctx)
         except urllib.error.URLError as te:
-            print("Could not exchange code for tokens")
-            raise te
+            raise Exception("The token request needs to be completed. Server error: %s" % te.reason)
 
         token_data = json.loads(token_response.read())
 
