@@ -54,12 +54,6 @@
             $('.btn').click(function (event) {
                 event.stopPropagation();
             });
-
-            $('#copy-id-token').click(function(event) {
-                $(this).focus();
-                $(this).select();
-                document.execCommand('copy');
-            });
         });
     </script>
 </head>
@@ -96,11 +90,10 @@
     <div class="row">
         <div class="col-md-3"></div>
         <div class="col-md-6">
-
                 <ul class="list-group">
                     {% if session.id_token %}
                         <li class="list-group-item">ID Token
-                            <a href="#" class="btn btn-xs btn-success pull-right" id="copy-id-token">copy</a>
+                            <a href="https://oauth.tools/jwt={{ session.id_token }}" class="btn btn-xs btn-info pull-right" id="oauth-tooos">Open in oauth.tools</a>
                         </li>
                         <div>
                             <pre id="id-token">{{ session.id_token | e }}</pre>
@@ -110,7 +103,7 @@
                     {% if session.access_token %}
                         <li class="list-group-item">Access Token
                             {% if session.refresh_token %}
-                                <a href="/refresh" class="btn btn-xs btn-info pull-right" id="refresh">refresh</a>
+                            <a href="/refresh" class="btn btn-xs btn-info pull-right" id="refresh">refresh</a>
                             {% endif %}
                         </li>
                         <div>
