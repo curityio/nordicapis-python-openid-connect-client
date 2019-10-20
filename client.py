@@ -44,20 +44,12 @@ class Client:
         if 'revocation_endpoint' not in self.server_config:
             raise Exception('Server configuration did not contain a revocation endpoint')
 
-        ## Exercise 3
+        # Exercise 3
         # Add the parameters needed to fullfull the revoke token request.
         # Revoking the Refresh Token should make the Access Token invalid, as well as the refresh token
         data = {'client_id': self.client_config['client_id']}
 
-        try:
-            urllib.request.urlopen(
-                self.server_config['revocation_endpoint'],
-                urllib.parse.urlencode(data).encode(),
-                context=self.ctx)
-        except urllib.error.URLError as te:
-            raise Exception(
-                "The revoke request needs to be completed. Server error: %s" %
-                te.reason)
+        return self.__post_request(self.server_config['revoke_endpoint'], data)
 
     def refresh(self, refresh_token):
         """
@@ -65,15 +57,11 @@ class Client:
         :param refresh_token:
         :return: the new access token
         """
-        ## Exercise 2
+        # Exercise 2
         # Add the parameters needed to fullfull the refresh token request.
         data = {'client_id': self.client_config['client_id']}
 
-        try:
-            token_response = urllib.request.urlopen(self.server_config['token_endpoint'], urllib.parse.urlencode(data).encode(), context=self.ctx)
-        except urllib.error.URLError as te:
-            raise Exception( "The refresh request needs to be completed. Server error: %s" % te.reason)
-        return json.loads(token_response.read())
+        return self.__post_request(self.server_config['token_endpoint'], data)
 
     def get_authorization_request_url(self, state):
         """
@@ -92,7 +80,7 @@ class Client:
         :return the json response containing the tokens
         """
 
-        ## Exercise 1
+        # Exercise 1
         # Add the parameters needed to exchange the authorization code for the requested token(s)
         # Only the data map needs to be updated
         # Hint: The client needs to be authenticated, and the token endpoint needs to be instructed what protocol to adhere to.
@@ -102,22 +90,12 @@ class Client:
         }
 
         # Exchange code for tokens
-        try:
-            token_response = urllib.request.urlopen(
-                self.server_config['token_endpoint'],
-                urllib.parse.urlencode(data).encode(),
-                context=self.ctx)
-        except urllib.error.URLError as te:
-            raise Exception(
-                "The token request needs to be completed. Server error: %s" %
-                te.reason)
-
-        token_data = json.loads(token_response.read())
+        token_data = self.__post_request(self.server_config['token_endpoint'], data)
 
         if 'id_token' in token_data:
             issuer = self.client_config['issuer']
 
-            ## Exercise 4
+            # Exercise 4
             # Enforce the correct audience for the id token
             # The validate function will enforce it as long as parameter is set.
             audience = None
@@ -213,3 +191,11 @@ class Client:
             ctx.check_hostname = False
             ctx.verify_mode = ssl.CERT_NONE
         return ctx
+
+    def __post_request(self, endpoint, data):
+        print('Performing post request to %s' % endpoint)
+        try:
+            response = urllib.request.urlopen(endpoint, urllib.parse.urlencode(data).encode(), context=self.ctx)
+            return json.loads(response.read())
+        except urllib.error.HTTPError as e:
+            raise Exception("Error response from server. Status code: %s, message: %s" % (e.status, e.reason))
