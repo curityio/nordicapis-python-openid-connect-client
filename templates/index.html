@@ -93,7 +93,7 @@
                 <ul class="list-group">
                     {% if session.id_token %}
                         <li class="list-group-item">ID Token
-                            <a href="https://oauth.tools/jwt={{ session.id_token }}" class="btn btn-xs btn-info pull-right" id="oauth-tooos">Open in oauth.tools</a>
+                            <a href="https://oauth.tools#jwt={{ session.id_token }}" class="btn btn-xs btn-info pull-right" id="oauth-tooos">Open in oauth.tools</a>
                         </li>
                         <div>
                             <pre id="id-token">{{ session.id_token | e }}</pre>
