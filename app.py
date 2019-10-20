@@ -87,8 +87,8 @@ def refresh():
     try:
         token_data = _client.refresh(user.refresh_token)
     except Exception as e:
-        create_error('Could not refresh Access Token', e)
-        return
+        return create_error('Could not refresh Access Token', e)
+
     user.access_token = token_data['access_token']
     user.refresh_token = token_data['refresh_token']
     return redirect_with_baseurl('/')
