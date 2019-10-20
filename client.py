@@ -16,9 +16,6 @@
 
 import json
 import ssl
-import random
-import string
-import base64
 import urllib.request
 import urllib.parse
 import urllib.error
@@ -50,12 +47,17 @@ class Client:
         ## Exercise 3
         # Add the parameters needed to fullfull the revoke token request.
         # Revoking the Refresh Token should make the Access Token invalid, as well as the refresh token
-        data = {'client_id': self.client_config['client_id'] }
+        data = {'client_id': self.client_config['client_id']}
 
         try:
-            urllib.request.urlopen(self.server_config['revocation_endpoint'], urllib.parse.urlencode(data).encode(), context=self.ctx)
+            urllib.request.urlopen(
+                self.server_config['revocation_endpoint'],
+                urllib.parse.urlencode(data).encode(),
+                context=self.ctx)
         except urllib.error.URLError as te:
-            raise Exception("The revoke request needs to be completed. Server error: %s" % te.reason)
+            raise Exception(
+                "The revoke request needs to be completed. Server error: %s" %
+                te.reason)
 
     def refresh(self, refresh_token):
         """
@@ -70,7 +72,7 @@ class Client:
         try:
             token_response = urllib.request.urlopen(self.server_config['token_endpoint'], urllib.parse.urlencode(data).encode(), context=self.ctx)
         except urllib.error.URLError as te:
-            raise Exception("The refresh request needs to be completed. Server error: %s" % te.reason)
+            raise Exception( "The refresh request needs to be completed. Server error: %s" % te.reason)
         return json.loads(token_response.read())
 
     def get_authorization_request_url(self, state):
@@ -94,14 +96,21 @@ class Client:
         # Add the parameters needed to exchange the authorization code for the requested token(s)
         # Only the data map needs to be updated
         # Hint: The client needs to be authenticated, and the token endpoint needs to be instructed what protocol to adhere to.
-        data = {'client_id': self.client_config['client_id'],
-                'redirect_uri': self.client_config['redirect_uri']}
+        data = {
+            'client_id': self.client_config['client_id'],
+            'redirect_uri': self.client_config['redirect_uri']
+        }
 
         # Exchange code for tokens
         try:
-            token_response = urllib.request.urlopen(self.server_config['token_endpoint'], urllib.parse.urlencode(data).encode(), context=self.ctx)
+            token_response = urllib.request.urlopen(
+                self.server_config['token_endpoint'],
+                urllib.parse.urlencode(data).encode(),
+                context=self.ctx)
         except urllib.error.URLError as te:
-            raise Exception("The token request needs to be completed. Server error: %s" % te.reason)
+            raise Exception(
+                "The token request needs to be completed. Server error: %s" %
+                te.reason)
 
         token_data = json.loads(token_response.read())
 
@@ -110,7 +119,7 @@ class Client:
 
             ## Exercise 4
             # Enforce the correct audience for the id token
-            # The validate function will enforce it as long as parameter is set. 
+            # The validate function will enforce it as long as parameter is set.
             audience = None
 
             self.__validate_jwt(token_data['id_token'], issuer, audience)
@@ -147,11 +156,13 @@ class Client:
         :param state: state to send to authorization server
         :return a map of arguments to be sent to the authz endpoint
         """
-        args = {'scope': self.client_config['scope'],
-                'response_type': 'code',
-                'client_id': self.client_config['client_id'],
-                'state': state,
-                'redirect_uri': self.client_config['redirect_uri']}
+        args = {
+            'scope': self.client_config['scope'],
+            'response_type': 'code',
+            'client_id': self.client_config['client_id'],
+            'state': state,
+            'redirect_uri': self.client_config['redirect_uri']
+        }
         return args
 
     def __validate_client_config(self):

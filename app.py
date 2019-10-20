@@ -15,13 +15,13 @@
 ##########################################################################
 
 import json
-import sys
 import string
 import base64
 import random
 from flask import redirect, request, render_template, session, Flask
 from client import Client
 
+global _app
 _app = Flask(__name__)
 
 
@@ -32,8 +32,6 @@ class UserSession:
     access_token = None
     refresh_token = None
     id_token = None
-    id_token_json = None
-    name = None
 
 
 @_app.route('/')
@@ -75,7 +73,7 @@ def logout():
     session.clear()
     if 'logout_endpoint' in _config:
         print("Logging out against", _config['logout_endpoint'])
-        return redirect(_config['logout_endpoint'] + '?redirect_uri=' + _base_url)
+        return redirect(_config['logout_endpoint'] + '?redirect_uri=' + _config['base_url'])
     return redirect_with_baseurl('/')
 
 
@@ -184,7 +182,7 @@ def load_config():
 
 
 def redirect_with_baseurl(path):
-    return redirect(_base_url + path)
+    return redirect(_config['base_url'] + path)
 
 
 def get_config_or_default(config_key, config, default):
@@ -203,22 +201,25 @@ def generate_random_string(size=20):
     return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(size))
 
 
-if __name__ == '__main__':
+def start(config):
     # load the config
-    _config = load_config()
+    global _config
+    _config = config
 
     # some default values
-    _debug = get_config_or_default('debug', _config, False)
-    _port = get_config_or_default('port', _config, 9080)
-    _base_url = get_config_or_default('base_url', _config, '')
+    debug = get_config_or_default('debug', _config, True)
+    port = get_config_or_default('port', _config, 9080)
+    _config['base_url'] = get_config_or_default('base_url', _config, '')
     _config['verify_ssl_server'] = get_config_or_default('verify_ssl_server', _config, True)
 
     # Create the client
+    global _client
     _client = Client(_config)
 
     # create a session store
+    global _session_store
     _session_store = {}
 
     # initiate the app
     _app.secret_key = generate_random_string()
-    _app.run('0.0.0.0', debug=_debug, port=_port)
+    _app.run('0.0.0.0', debug=debug, port=port)
