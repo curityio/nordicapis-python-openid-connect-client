@@ -49,7 +49,7 @@ class Client:
         # Revoking the Refresh Token should make the Access Token invalid, as well as the refresh token
         data = {'client_id': self.client_config['client_id']}
 
-        return self.__post_request(self.server_config['revoke_endpoint'], data)
+        return self.__post_request(self.server_config['revocation_endpoint'], data)
 
     def refresh(self, refresh_token):
         """
