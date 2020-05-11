@@ -1,4 +1,8 @@
 # OAuth/OpenID Connect Workshop
+
+[![Quality](https://curity.io/assets/images/badges/nordicapis-python-openid-connect-client-quality.svg)](https://curity.io/resources/code-examples/status/)
+[![Availability](https://curity.io/assets/images/badges/nordicapis-python-openid-connect-client-availability.svg)](https://curity.io/resources/code-examples/status/)
+
 This is a OpenID Connect example, used as an assigment in the OAuth2 and OpenID Connect workshop given by Curity AB.
 
 ## Dependencies
